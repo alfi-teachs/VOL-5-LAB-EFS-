@@ -1,53 +1,105 @@
 # VOL-5-LAB-EFS-
-
-
-AWS EFS with EC2 – Step-by-Step Lab
-# Step 1: Launch EC2 Instance
-Go to EC2 Dashboard
-Click Launch Instance
-Configure:
+AWS EFS with EC2 – Clean Lab Setup
+# Step 1: Create EC2 Instance
+Launch EC2
 AMI: Amazon Linux
 Instance type: t2.micro
-Key pair: Create or select existing
-Under Network settings:
-Choose a VPC
-Create a Security Group (EC2-SG):
-SSH (Port 22) → Anywhere (IPv4)
-Launch the instance
-
-# Step 2: Create EFS File System
-Go to EFS Dashboard
-Click Create File System
-Provide:
-Name (e.g., my-efs)
-Select same VPC as EC2
-Click Create
-
-# Step 3: Configure EFS Security Group
-Go to Security Groups
-Find the security group attached to EFS (or create new: EFS-SG)
-Add Inbound Rule:
+Key pair: create/select
+Network: choose VPC
+Subnet: any public subnet
+Launch instance
+Step 2: Create EFS (Elastic File System)
+Go to EFS → Create File System
+Give a name
+Important: Select the same VPC as EC2
+Create EFS
+Step 3: Configure Security Groups (Important Part)
+A. EC2 Security Group
+Inbound rules:
+SSH (Port 22) → Anywhere (0.0.0.0/0)
+NFS (Port 2049) → EFS Security Group (best practice)
+B. EFS Security Group
+Go to EFS → Network → Security Group
+Edit inbound rules:
 Type: NFS
 Port: 2049
-Source: EC2-SG (Security Group of EC2 instance)
+Source: EC2 Security Group
 
-This ensures only your EC2 can access EFS.
+This creates secure communication between EC2 and EFS.
 
-# Step 4: Update EC2 Security Group
-Go to EC2 → Instance → Security
-Edit EC2-SG
-Add Inbound Rule:
-Type: NFS
-Port: 2049
-Source: Anywhere (IPv4) (for lab purpose)
-(In real-world, restrict to EFS-SG)
+Step 4: Connect to EC2
+ssh -i key.pem ec2-user@<public-ip>
 
-# Step 5: Connect to EC2 Instance
-ssh -i your-key.pem ec2-user@<public-ip>
 
-# Step 6: Install NFS Client
-sudo yum install -y nfs-utils
+Switch to root:
 
+sudo su
+
+Step 5: Install EFS Utilities
+yum install amazon-efs-utils -y
+
+Step 6: Mount EFS on EC2
+
+Create directory:
+
+mkdir /efs
+cd /efs
+
+
+Go to EFS → Attach → Copy mount via DNS (EFS helper)
+
+Example:
+
+mount -t efs fs-xxxx:/ /efs
+
+
+Verify:
+
+df -h
+
+
+Create test files:
+
+touch f1 f2 f3
+ls
+
+Step 7: Create Second EC2 Instance
+Same VPC
+Same subnet (or another subnet in same VPC)
+Attach same EC2 security group
+Step 8: Mount EFS on Second Server
+
+Connect:
+
+sudo su
+yum install amazon-efs-utils -y
+mkdir /store
+
+
+Mount:
+
+mount -t efs fs-xxxx:/ /store
+
+
+Check:
+
+cd /store
+ls
+
+
+You should see:
+
+f1 f2 f3
+
+What this really means
+EFS is shared storage
+Multiple EC2 instances can access the same data
+It behaves like a network drive (NFS)
+Common Mistakes You Had (Fixed)
+Don’t allow NFS from Anywhere (0.0.0.0/0) → security risk
+Always use Security Group as source
+No need to remove default SG randomly
+Keep architecture clean and controlled
 
 
 
