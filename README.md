@@ -32,7 +32,7 @@ remove default
 check one we created and create --save
 
 
-go to security group 
+# go to security group 
 name efs -sever 
 and change default of efs securuity group
 
