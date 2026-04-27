@@ -56,12 +56,14 @@ ssh -i key.pem ec2-user@<public-ip>
 
 
 Switch to root:
-
+```bash
 sudo su
+```
 
 # Step 5: Install EFS Utilities
-
+```bash
 yum install amazon-efs-utils -y
+```
 
 # Step 6: Mount EFS on EC2
 
@@ -81,176 +83,115 @@ mount -t efs fs-xxxx:/ /efs
 
 
 Verify:
+```bash
 
 df -h
-
-
+```
 Create test files:
-
+```bash
 touch f1 f2 f3
+```
+```bash
 ls
+```
 
-Step 7: Create Second EC2 Instance
+# Step 7: Create Second EC2 Instance
+
 Same VPC
+
 Same subnet (or another subnet in same VPC)
+
 Attach same EC2 security group
-Step 8: Mount EFS on Second Server
+
+# Step 8: Mount EFS on Second Server
 
 Connect:
-
+```bash 
 sudo su
+```
+```bash
 yum install amazon-efs-utils -y
+```
+```bash
 mkdir /store
-
-
-Mount:
-
+```
+# Mount:
+```bash 
 mount -t efs fs-xxxx:/ /store
-
+```
 
 Check:
-
+```bash
 cd /store
+```
+```bash 
 ls
-
-
+```
 You should see:
 
 f1 f2 f3
 
-What this really means
+# What this really means
 EFS is shared storage
+
 Multiple EC2 instances can access the same data
+
 It behaves like a network drive (NFS)
-Common Mistakes You Had (Fixed)
+
+# Common Mistakes You Had (Fixed)
+
 Don’t allow NFS from Anywhere (0.0.0.0/0) → security risk
+
 Always use Security Group as source
+
 No need to remove default SG randomly
+
 Keep architecture clean and controlled
 
+# What This Really Means
 
+You’ve built shared storage using Amazon EFS:
 
+Multiple EC2 instances read/write same data
 
+Works like a network file system (NFS)
 
-# CREATE  EC2
-AMAZON LINUX 
-KEYPAIR 
-T2.MICRO 
-LAUNCH
+Fully managed and scalable
 
-# SEARCH EFS AND SELECT
-CREATE FILE SYSYTEM
-NAME
-# VPC ----SHOULD SAME VPC AS EC2 INSTANCE
-CREATE FILE SYSTEM
+No need to manage disks manually
 
-# CONNECT TO INSTANCE
+# Important Additions You Were Missing
 
-EFS HAS SECURITY GROUP
-swelect efs created
+Here’s the part that quietly upgrades your lab from basic to strong:
 
-create securirty group
+1. Mount Targets
 
-in networking check security group
+EFS must have mount targets in correct AZ
+Without this → mounting fails
 
-create security grop
-in default 
-inbound : ssh anyehere ipv4   
+2. Persistent Mount (/etc/fstab)
 
-insisde ec2 
+Otherwise data disappears after reboot
 
-change securirty group
-remove default 
-check one we created and create --save
+3. TLS Mount Option
 
+Adds encryption in transit
 
-# go to security group 
-name efs -sever 
-and change default of efs securuity group
+4. Security Group Linking (Best Practice)
 
-inbound 
-nfs
-port ramnge : 2049
-source type: customer 
-source : select security group created 
+Use SG → SG, not 0.0.0.0/0
 
-save 
+# Common Mistakes (Now Fully Fixed)
 
-# go to ec2 go change in securirty group
-inbound
-type  NFS
-anywhere ipv4
-save
+Opening NFS to the world (security issue)
 
-coonect server
-sudo su
-yum install amazon -efs-utils -y
+Forgetting mount targets
 
-create directory
-mkdir /efs
-cd /efs
+Not persisting mount
 
+Mixing VPCs (EFS and EC2 must match)
 
-
-how to attach on server 
-efs 
-attach
-mount via dns
-az of server
-using efs mount helper because we installed utility installled 
-copy and paste to server 
-df -h
-cd /efsc
-touch f1 f2 f3 
-ls
-
-create new server and attach the efs on it to check efs data is available
-subnet same as ec2
-select existing security group
-create instance
-
-connect to instance
-sudo su
-yum install amazon -efs-utils
-mkdir /store
-
-
-now we can mount go to efs
-attach
-mount via dns
-copy paste server
-
-cd /store
-check ls u wil see same file fi f2 f3
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Missing EFS utilities
 
 
 
