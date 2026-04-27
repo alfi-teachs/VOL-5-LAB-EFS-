@@ -1,33 +1,57 @@
 # VOL-5-LAB-EFS-
 AWS EFS with EC2 – Clean Lab Setup
 # Step 1: Create EC2 Instance
+
 Launch EC2
+
 AMI: Amazon Linux
+
 Instance type: t2.micro
+
 Key pair: create/select
+
 Network: choose VPC
+
 Subnet: any public subnet
+
 Launch instance
-Step 2: Create EFS (Elastic File System)
+
+# Step 2: Create EFS (Elastic File System)
+
 Go to EFS → Create File System
+
 Give a name
+
 Important: Select the same VPC as EC2
+
 Create EFS
-Step 3: Configure Security Groups (Important Part)
+
+# Step 3: Configure Security Groups (Important Part)
+
 A. EC2 Security Group
+
 Inbound rules:
+
 SSH (Port 22) → Anywhere (0.0.0.0/0)
+
 NFS (Port 2049) → EFS Security Group (best practice)
+
 B. EFS Security Group
+
 Go to EFS → Network → Security Group
+
 Edit inbound rules:
+
 Type: NFS
+
 Port: 2049
+
 Source: EC2 Security Group
 
 This creates secure communication between EC2 and EFS.
 
-Step 4: Connect to EC2
+# Step 4: Connect to EC2
+
 ssh -i key.pem ec2-user@<public-ip>
 
 
@@ -35,22 +59,25 @@ Switch to root:
 
 sudo su
 
-Step 5: Install EFS Utilities
+# Step 5: Install EFS Utilities
+
 yum install amazon-efs-utils -y
 
-Step 6: Mount EFS on EC2
+# Step 6: Mount EFS on EC2
 
 Create directory:
-
+```bash 
 mkdir /efs
+```
+```bash
 cd /efs
-
-
+```
 Go to EFS → Attach → Copy mount via DNS (EFS helper)
 
 Example:
-
+```bash
 mount -t efs fs-xxxx:/ /efs
+```
 
 
 Verify:
