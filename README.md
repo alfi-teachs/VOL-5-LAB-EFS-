@@ -126,19 +126,24 @@ Connect:
 ```bash 
 sudo su
 ```
+# step 9
 Install EFS utilities
 
 This installs the required package to mount Amazon EFS easily.
+
 ```bash
 yum install amazon-efs-utils -y
 ```
+# step 10 
 Create mount directory
 
 This creates a folder where the EFS will be attached.
 ```bash
 mkdir /store
 ```
-# Mount the EFS
+
+# step 11
+Mount the EFS
 
 This connects your EFS file system to the directory /store.
 Replace fs-xxxx with your actual EFS File System ID.
@@ -146,6 +151,7 @@ Replace fs-xxxx with your actual EFS File System ID.
 ```bash 
 mount -t efs fs-xxxx:/ /store
 ```
+# step 12
 Go inside the mounted directory
 
 This moves you into the EFS storage location.
@@ -154,6 +160,7 @@ Check:
 ```bash
 cd /store
 ```
+# step 13
 List files
 
 This shows the files stored in EFS.
