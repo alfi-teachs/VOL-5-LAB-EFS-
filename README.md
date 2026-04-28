@@ -1,6 +1,6 @@
 Lab: EC2 with EFS using Security Groups (SSH + NFS
 
-Step 1: Create Security Group for EC2
+# Step 1: Create Security Group for EC2
 
 Go to EC2 → Security Groups → Create
 
@@ -18,7 +18,7 @@ Allow all (default)
 
 Create SG.
 
-Step 2: Create Security Group for EFS
+# Step 2: Create Security Group for EFS
 
 Create another Security Group.
 
@@ -32,18 +32,21 @@ Source: Select EC2-SG (not IP)
 This is important:
 → Only EC2 instances with that SG can access EFS
 
-Step 3: Create EFS
+# Step 3: Create EFS
 
 Go to EFS → Create File System
 
 Name: MyEFS
+
 Select same VPC as EC2
+
 In Network settings:
+
 Assign EFS-SG
 
 Create file system.
 
-Step 4: Launch EC2 Instance
+# Step 4: Launch EC2 Instance
 
 Go to EC2 → Launch Instance
 
@@ -60,9 +63,9 @@ Security Group: Select EC2-SG
 Launch instance.
 
 # Step 4: Connect to EC2
-
+```bash
 ssh -i key.pem ec2-user@<public-ip>
-
+```
 
 Switch to root:
 ```bash
@@ -83,7 +86,7 @@ mkdir /efs
 ```bash
 cd /efs
 ```
-Go to EFS → Attach → Copy mount via DNS (EFS helper)
+# Go to EFS → Attach → Copy mount via DNS (EFS helper)
 
 Example:
 ```bash
@@ -100,10 +103,11 @@ Create test files:
 ```bash
 touch f1 f2 f3
 ```
+list files :
+
 ```bash
 ls
 ```
-
 # Step 7: Create Second EC2 Instance
 
 Same VPC
@@ -114,25 +118,45 @@ Attach same EC2 security group
 
 # Step 8: Mount EFS on Second Server
 
+Become root user
+
+This gives full permissions to install packages and mount file systems.
 Connect:
+
 ```bash 
 sudo su
 ```
+Install EFS utilities
+
+This installs the required package to mount Amazon EFS easily.
 ```bash
 yum install amazon-efs-utils -y
 ```
+Create mount directory
+
+This creates a folder where the EFS will be attached.
 ```bash
 mkdir /store
 ```
-# Mount:
+# Mount the EFS
+
+This connects your EFS file system to the directory /store.
+Replace fs-xxxx with your actual EFS File System ID.
+
 ```bash 
 mount -t efs fs-xxxx:/ /store
 ```
+Go inside the mounted directory
 
+This moves you into the EFS storage location.
 Check:
+
 ```bash
 cd /store
 ```
+List files
+
+This shows the files stored in EFS.
 ```bash 
 ls
 ```
