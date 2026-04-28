@@ -1,84 +1,63 @@
-# VOL-5-LAB-EFS-
-AWS EFS with EC2 – Clean Lab Setup
+Lab: EC2 with EFS using Security Groups (SSH + NFS
 
-# Step 1: Launch EC2 Instance
-AMI: Amazon Linux 2
+Step 1: Create Security Group for EC2
+
+Go to EC2 → Security Groups → Create
+
+Name: EC2-SG
+
+Inbound Rules:
+
+SSH → Port 22 → Source: 0.0.0.0/0
+
+NFS → Port 2049 → Source: 0.0.0.0/0
+
+Outbound:
+
+Allow all (default)
+
+Create SG.
+
+Step 2: Create Security Group for EFS
+
+Create another Security Group.
+
+Name: EFS-SG
+
+Inbound Rules:
+
+NFS → Port 2049
+Source: Select EC2-SG (not IP)
+
+This is important:
+→ Only EC2 instances with that SG can access EFS
+
+Step 3: Create EFS
+
+Go to EFS → Create File System
+
+Name: MyEFS
+Select same VPC as EC2
+In Network settings:
+Assign EFS-SG
+
+Create file system.
+
+Step 4: Launch EC2 Instance
+
+Go to EC2 → Launch Instance
+
+AMI: Amazon Linux
+
 Instance type: t2.micro
-Key pair: create or select
-VPC: choose your custom VPC
-Subnet: public subnet
-Auto-assign Public IP: Enabled
 
-# Security Group (EC2-SG):
+Key pair: select/create
 
-SSH (22) → 0.0.0.0/0
-NFS (2049) → EFS-SG (we will create this next)
+Network: same VPC
 
-Launch the instance.
+Security Group: Select EC2-SG
 
-# Step 2: Create EFS (Elastic File System)
-
-Go to Amazon EFS
-
-Click Create File System
-
-Name your EFS
-
-Important: Select the same VPC as EC2
-
-Now, here’s the part many people miss:
-
-Create Mount Targets
-
-# Ensure EFS has mount targets in each subnet/AZ where EC2 runs
-
-# At least one mount target must exist in your EC2 subnet AZ
-
-# Step 3: Configure Security Groups (Important Part)
-
-A. Create EFS Security Group (EFS-SG)
-
-Inbound:
-
-Type: NFS
-Port: 2049
-Source: EC2-SG
-B. Update EC2 Security Group (EC2-SG)
-
-Inbound:
-
-SSH (22) → Anywhere
-NFS (2049) → EFS-SG
-
-This creates secure, controlled communication between EC2 and EFS.
-
-
-
-
-
-
-
-A. EC2 Security Group
-
-Inbound rules:
-
-SSH (Port 22) → Anywhere (0.0.0.0/0)
-
-NFS (Port 2049) → EFS Security Group (best practice)
-
-B. EFS Security Group
-
-Go to EFS → Network → Security Group
-
-Edit inbound rules:
-
-Type: NFS
-
-Port: 2049
-
-Source: EC2 Security Group
-
-This creates secure communication between EC2 and EFS.
+Launch instance.
 
 # Step 4: Connect to EC2
 
